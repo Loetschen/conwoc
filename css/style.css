@@ -1,0 +1,25 @@
+.wrapper{
+  margin-top: 5em;
+}
+
+.footer{
+  margin-top: 5em;
+}
+
+.neuer_post{
+  margin-top: -4.5em;
+  z-index: 1000;
+}
+
+.abstand{
+  margin-top: 10em;
+
+}
+
+.float{
+  float: left;
+}
+
+.abstand2{
+  margin-left: 4em;
+}
