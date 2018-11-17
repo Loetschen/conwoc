@@ -69,13 +69,14 @@ include_once 'vorgaben/login_check.php';
                 $sql = "SELECT * FROM user";
               }
 
+              $db = "SELECT * FROM freunde WHERE nutzer = $user";
+
               foreach ($pdo->query($sql) as $row) {
                 $freundID = $row['ID'];
                 if ($user !== $freundID) {
 
-                  $db = "SELECT * FROM freunde WHERE nutzer = $user";
-                  foreach ($pdo->query($db) as $ab) {
-                    if ($freundID == $ab['freund_von']) {
+                  foreach ($pdo->query($db) as $row2) {
+                    if ($freundID == $row2['freund_von'] AND $user == $row2['nutzer']) {
 
                       ?>
                       <tr>
