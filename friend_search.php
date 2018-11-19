@@ -76,7 +76,7 @@ include_once 'vorgaben/login_check.php';
                 if ($user !== $freundID) {
 
                   foreach ($pdo->query($db) as $row2) {
-                    if ($freundID == $row2['freund_von'] AND $user == $row2['nutzer']) {
+                    if ($freundID == $row2['freund_von']) {
 
                       ?>
                       <tr>
