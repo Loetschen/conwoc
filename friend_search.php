@@ -1,5 +1,7 @@
 <?php
+// NOTE: Datenbank verbindung wird eingebettet
 include_once 'vorgaben/db.php';
+// NOTE: Login Check wird eingepettet
 include_once 'vorgaben/login_check.php';
 ?>
 <!doctype html>
@@ -18,37 +20,36 @@ include_once 'vorgaben/login_check.php';
       <div class="container">
 
         <?php
-
+          // NOTE: Wird geprüft ob ein Spieler hinzugefügt werden will
           if (isset($_GET['add'])) {
+            // NOTE: ausgangslage für Fehlermeldung False
             $error = false;
+            // NOTE: Get mit der ID wird übergeben
             $add = $_GET['add'];
 
-/*            $statement = $pdo->prepare("SELECT * FROM freunde WHERE nutzer = :nutzer");
-            $result = $statement->execute(array('nutzer' => $user));
-            $user = $statement->fetch();
+            // NOTE: Wird geprüft ob man bereits befreundet ist
+            $statement = $pdo->prepare("SELECT * FROM freunde WHERE nutzer = :nutzer AND freund_von = :freund_von");
+            $result = $statement->execute(array('nutzer' => $user,
+                                                'freund_von' => $add));
+            $user_test = $statement->fetch();
 
-            if($user !== false) {
+            // NOTE: Anzeige wenn man bereits befreundet ist, Fhler Meldung wird auf True gewechselt
+            if($user_test !== false) {
                 echo "Ihr seid bereits befreundet!";
                 $error = true;
-            }*/
+            }
 
+            // NOTE: Wenn Fehlermeldung negativ, Freund wird hinzugefügt
             if (!$error) {
               $statement = $pdo->prepare("INSERT INTO freunde (nutzer, freund_von) VALUES (:nutzer, :freund_von)");
               $statement->execute(array('nutzer' => $user,
                                         'freund_von' => $add));
-              }
-          }
-
-          if (isset($_GET['delete'])) {
-            $del = $_GET['delete'];
-
-            $statement = $pdo->prepare("DELETE FROM freunde WHERE freund_von = ?");
-            $statement->execute(array($del));
+            }
           }
 
          ?>
 
-        <table class="table table-striped" id="freunde">
+        <table class="table table-striped">
           <thead>
             <tr>
               <th scope="col">User Name</th>
@@ -60,41 +61,32 @@ include_once 'vorgaben/login_check.php';
           <tbody>
 
             <?php
+              // NOTE: Wird geprüft ob eine Eingabe erfolgt ist
               if (isset($_POST['suche'])) {
+                // NOTE: Such eingabe wird übergeben
                 $suche = $_POST['suche'];
-                $sql = "SELECT * FROM user WHERE user_name LIKE '%$suche%'
-                                              OR vorname LIKE '%$suche%'
-                                              OR nachname LIKE '%$suche%' ORDER BY user_name ASC";
-              }else {
+                // NOTE: Es wird gesucht ob die Eingabe im Usernamen, Vor oder Nachmanem vorhanden ist
+                $sql = "SELECT * FROM user WHERE user_name LIKE '%$suche%' OR vorname LIKE '%$suche%' OR nachname LIKE '%$suche%' ORDER BY user_name ASC";
+              }else
+              // NOTE: Wenn nicht, werden alle Nutzer angezeigt
+              {
                 $sql = "SELECT * FROM user";
               }
-
-              $db = "SELECT * FROM freunde WHERE nutzer = $user";
-
+              // NOTE: die Ergebnisse werden ausgegeben
               foreach ($pdo->query($sql) as $row) {
                 $freundID = $row['ID'];
+                // NOTE: Test, damit man selber nicht angezeigt wird
                 if ($user !== $freundID) {
 
-                  foreach ($pdo->query($db) as $row2) {
-                    if ($freundID == $row2['freund_von']) {
+             ?>
 
-                      ?>
-                      <tr>
-                        <th scope="row"><?php echo $row['user_name']; ?></th>
-                        <td><?php echo $row['vorname']; ?></td>
-                        <td><?php echo $row['nachname']; ?></td>
-                        <td><a class="btn btn-secondary" href="<?php echo "?delete=" . $row['ID']; ?>" role="button">Entfernen</a></td>
-                      </tr>
-                      <?php
-                    }else{
-                  ?>
-                      <tr>
-                        <th scope="row"><?php echo $row['user_name']; ?></th>
-                        <td><?php echo $row['vorname']; ?></td>
-                        <td><?php echo $row['nachname']; ?></td>
-                        <td><a class="btn btn-primary" href="<?php echo "?add=" . $row['ID']; ?>" role="button">Hinzufügen</a></td>
-                      </tr>
-            <?php } } } } ?>
+            <tr>
+              <th scope="row"><a href="profil_freund.php?freund=<?php echo $row['ID']; ?>" class="text-dark"><?php echo $row['user_name']; ?></a></th>
+              <td><?php echo $row['vorname']; ?></td>
+              <td><?php echo $row['nachname']; ?></td>
+              <td><a class="btn btn-primary" href="<?php echo "?add=" . $row['ID']; ?>" role="button">Hinzufügen</a></td>
+            </tr>
+          <?php } } ?>
           </tbody>
         </table>
       </div>
